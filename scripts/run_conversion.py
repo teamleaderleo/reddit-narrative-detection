@@ -5,6 +5,7 @@ import multiprocessing
 import time
 
 # --- Define Our Project Paths ---
+# This automatically finds the root of our project.
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RAW_DATA_DIR = os.path.join(BASE_DIR, "data", "raw")
 PROCESSED_DATA_DIR = os.path.join(BASE_DIR, "data", "processed")
@@ -59,7 +60,7 @@ def jsonl_to_csv(jsonl_filename, csv_filename, fields):
 # It ensures the main code runs only once, not in the child processes.
 if __name__ == "__main__":
 
-    print(">>> Preparing to process 4 files in parallel... <<< \n")
+    print(">>> Preparing to process files in parallel... <<< \n")
 
     # --- Fields we care about ---
     comment_fields = [
@@ -85,25 +86,19 @@ if __name__ == "__main__":
         "permalink",
     ]
 
-    # --- List of all tasks to be done ---
-    # Each item is a tuple containing the arguments for our worker function.
     tasks = [
-        ("politics_comments.jsonl", "politics_comments_cleaned.csv", comment_fields),
+        ("r_politics_comments.jsonl", "politics_comments_cleaned.csv", comment_fields),
         (
-            "conservative_comments.jsonl",
+            "r_conservative_comments.jsonl",
             "conservative_comments_cleaned.csv",
             comment_fields,
         ),
-        ("politics_submissions.jsonl", "politics_submissions_cleaned.csv", post_fields),
-        (
-            "conservative_submissions.jsonl",
-            "conservative_submissions_cleaned.csv",
-            post_fields,
-        ),
+        ("r_politics_posts.jsonl", "politics_posts_cleaned.csv", post_fields),
+        ("r_conservative_posts.jsonl", "conservative_posts_cleaned.csv", post_fields),
     ]
 
     # --- Create a Pool of worker processes ---
-    # This will create as many processes as you have CPU cores, up to the number of tasks.
+    # This will create as many processes as we have CPU cores, up to the number of tasks.
     with multiprocessing.Pool() as pool:
         # starmap will unpack each task tuple into the 3 arguments
         # that our redesigned correctly accepts.
