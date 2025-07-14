@@ -1,0 +1,41 @@
+# --- Data Files ---
+# Ignore the entire data directory. This is safer than ignoring
+# by extension, as it covers any file type (raw, processed, etc.)
+/data/
+
+# If we prefer to ignore by extension, we can use:
+# *.jsonl
+# *.csv
+# *.parquet
+# *.zst
+
+
+# --- Frontend (Next.js / Node.js) ---
+# Our original .gitignore, slightly cleaned up for this structure.
+/frontend/node_modules/
+/frontend/.next/
+/frontend/out/
+/frontend/build/
+/frontend/dist/
+/frontend/.vercel/
+/frontend/npm-debug.log*
+/frontend/yarn-debug.log*
+/frontend/yarn-error.log*
+/frontend/.pnpm-debug.log*
+/frontend/*.tsbuildinfo
+/frontend/next-env.d.ts
+
+
+# --- Python ---
+# Ignore Python virtual environments and cache files.
+__pycache__/
+venv/
+.venv/
+*.pyc
+
+
+# --- General / OS ---
+# Miscellaneous files that should always be ignored.
+.DS_Store
+*.pem
+.env*
