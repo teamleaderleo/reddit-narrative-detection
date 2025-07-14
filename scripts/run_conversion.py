@@ -10,13 +10,11 @@ RAW_DATA_DIR = os.path.join(BASE_DIR, "data", "raw")
 PROCESSED_DATA_DIR = os.path.join(BASE_DIR, "data", "processed")
 
 
-def jsonl_to_csv(task_details):
+# The function now accepts three separate arguments instead of one tuple.
+def jsonl_to_csv(jsonl_filename, csv_filename, fields):
     """
     Worker function that processes a single file.
-    It now accepts a single tuple with all its arguments.
     """
-    jsonl_filename, csv_filename, fields = task_details
-
     # Construct the full paths to the input and output files
     input_path = os.path.join(RAW_DATA_DIR, jsonl_filename)
     output_path = os.path.join(PROCESSED_DATA_DIR, csv_filename)
@@ -107,8 +105,8 @@ if __name__ == "__main__":
     # --- Create a Pool of worker processes ---
     # This will create as many processes as you have CPU cores, up to the number of tasks.
     with multiprocessing.Pool() as pool:
-        # The 'starmap' function takes our worker function and the list of tasks,
-        # and runs them all in parallel across the process pool.
+        # starmap will unpack each task tuple into the 3 arguments
+        # that our redesigned correctly accepts.
         results = pool.starmap(jsonl_to_csv, tasks)
 
     print("\n>>> ALL TASKS FINISHED. <<<")
