@@ -3,15 +3,15 @@ import os
 import time
 
 # --- Define Our Project Paths ---
-# This automatically finds the root of your project.
+# This automatically finds the root of our project.
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROCESSED_DATA_DIR = os.path.join(BASE_DIR, 'data', 'processed')
 COMBINED_DATA_DIR = os.path.join(BASE_DIR, 'data', 'combined')
 
-def combine_csv_files(file1_name, file2_name, output_filename):
+def combine_csv_files(file1_name, file2_name, output_filename, file_type):
     """
-    Reads two CSV files from the 'processed' directory, combines them,
-    and saves the result to the 'combined' directory.
+    Reads two CSV files, combines them, cleans the link_id if it's a comments file,
+    and saves the result.
     """
     input_path1 = os.path.join(PROCESSED_DATA_DIR, file1_name)
     input_path2 = os.path.join(PROCESSED_DATA_DIR, file2_name)
@@ -37,6 +37,16 @@ def combine_csv_files(file1_name, file2_name, output_filename):
 
     # Save the combined DataFrame to a new CSV file
     # index=False is important to prevent pandas from writing an extra column
+
+    # If this is a comments file, strip the 't3_' prefix from the link_id.
+    if file_type == "comments":
+        print("    -> Detected comments file. Cleaning 'link_id' column...")
+        # Ensure the column is treated as a string, then replace 't3_' with nothing.
+        combined_df["link_id"] = (
+            combined_df["link_id"].astype(str).str.replace("t3_", "", n=1)
+        )
+        print("    -> 'link_id' column cleaned.")
+
     combined_df.to_csv(output_path, index=False)
     
     duration = time.time() - start_time
@@ -48,16 +58,18 @@ if __name__ == "__main__":
 
     # Combine the two comment files
     combine_csv_files(
-        'politics_comments_cleaned.csv',
-        'conservative_comments_cleaned.csv',
-        'all_comments.csv'
+        "politics_comments_cleaned.csv",
+        "conservative_comments_cleaned.csv",
+        "all_comments.csv",
+        "comments",  # We pass a 'type' so the function knows to clean it
     )
 
     # Combine the two post files
     combine_csv_files(
-        'politics_posts_cleaned.csv',
-        'conservative_posts_cleaned.csv',
-        'all_posts.csv'
+        "politics_posts_cleaned.csv",
+        "conservative_posts_cleaned.csv",
+        "all_posts.csv",
+        "posts",  # This is not 'comments', so it will be skipped
     )
 
     print(">>> ALL FILES COMBINED. <<<")
