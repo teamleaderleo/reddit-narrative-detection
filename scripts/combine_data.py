@@ -39,16 +39,25 @@ def combine_csv_files(file1_name, file2_name, output_filename, file_type):
     # index=False is important to prevent pandas from writing an extra column
 
     # If this is a comments file, strip the 't3_' prefix from the link_id.
+    # If it has a parent, strip the t1_
     if file_type == "comments":
-        print("    -> Detected comments file. Cleaning 'link_id' column...")
-        # Ensure the column is treated as a string, then replace 't3_' with nothing.
+        print("    -> Detected comments file. Cleaning ID prefixes...")
+
+        # Clean link_id (e.g., 't3_123' -> '123')
         combined_df["link_id"] = (
             combined_df["link_id"].astype(str).str.replace("t3_", "", n=1)
         )
-        print("    -> 'link_id' column cleaned.")
+
+        # Clean parent_id (e.g., 't1_456' -> '456' OR 't3_789' -> '789')
+        # This handles replies to comments AND replies directly to posts.
+        combined_df["parent_id"] = (
+            combined_df["parent_id"].astype(str).str.replace(r"t[13]_", "", regex=True)
+        )
+
+        print("    -> 'link_id' and 'parent_id' columns cleaned.")
 
     combined_df.to_csv(output_path, index=False)
-    
+
     duration = time.time() - start_time
     print(f"--- DONE. Created {output_filename} with {len(combined_df):,} total rows in {duration:.2f} seconds. ---\n")
 
