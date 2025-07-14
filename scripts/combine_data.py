@@ -44,14 +44,14 @@ def combine_csv_files(file1_name, file2_name, output_filename, file_type):
         print("    -> Detected comments file. Cleaning ID prefixes...")
 
         # Clean link_id (e.g., 't3_123' -> '123')
+        prefix_regex = r"^t\d+_"
         combined_df["link_id"] = (
-            combined_df["link_id"].astype(str).str.replace("t3_", "", n=1)
+            combined_df["link_id"].astype(str).str.replace(prefix_regex, "", regex=True)
         )
-
-        # Clean parent_id (e.g., 't1_456' -> '456' OR 't3_789' -> '789')
-        # This handles replies to comments AND replies directly to posts.
         combined_df["parent_id"] = (
-            combined_df["parent_id"].astype(str).str.replace(r"t[13]_", "", regex=True)
+            combined_df["parent_id"]
+            .astype(str)
+            .str.replace(prefix_regex, "", regex=True)
         )
 
         print("    -> 'link_id' and 'parent_id' columns cleaned.")
